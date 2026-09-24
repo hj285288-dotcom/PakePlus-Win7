@@ -1,11 +1,176 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Document</title>
-    </head>
-    <body>
-        PakePlus
-    </body>
-</html>
+<!DOCTYPE html><html lang="zh-CN" class="h-screen w-screen" style="width:100%;height:100%;overflow:hidden;position:relative;"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Moen 补偿工具</title>
+<style data-purpose="critical-fallback">
+    html { background-color: #E8EAEC; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, 'Segoe UI', sans-serif;
+      background-color: #E8EAEC;
+      color: #334155;
+      overflow: hidden;
+    }
+    a { color: inherit; text-decoration: inherit; }
+    button { background-color: transparent; background-image: none; border-width: 0; border-style: solid; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; -webkit-appearance: none; appearance: none; }
+    img { display: block; }
+    /* 首屏门闸：默认隐藏页面，确认 Tailwind 样式表真的生成好了才显示，避免样式闪烁 */
+    html:not(.ui-ready) body { visibility: hidden; }
+    html.ui-ready body { visibility: visible; }
+</style>
+<script data-purpose="ui-gate">
+(function () {
+  var root = document.documentElement;
+  var MARK = '7533917';
+  var done = false, t0 = 0;
+  function reveal() {
+    if (done) return;
+    done = true;
+    var probe = document.getElementById('ui-gate-probe');
+    if (probe && probe.parentNode) probe.parentNode.removeChild(probe);
+    root.classList.add('ui-ready');
+  }
+  window.__revealUI = reveal;
+  function has(needle) {
+    var list = document.head ? document.head.getElementsByTagName('style') : [];
+    for (var i = 0; i < list.length; i++) {
+      var css = list[i].textContent || '';
+      if (css.length > 3000 && css.indexOf(needle) !== -1) return true;
+    }
+    return false;
+  }
+  function start() {
+    if (done) return;
+    if (!document.body) { setTimeout(start, 12); return; }
+    t0 = Date.now();
+    var probe = document.createElement('i');
+    probe.id = 'ui-gate-probe';
+    probe.className = 'z-[' + MARK + ']';
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = 'position:absolute;left:-9999px;top:0;width:0;height:0;visibility:hidden;';
+    document.body.appendChild(probe);
+    (function poll() {
+      if (has(MARK)) { reveal(); return; }
+      if (Date.now() - t0 > 900 && has('.text-xs')) { reveal(); return; }
+      if (Date.now() - t0 > 2500) { reveal(); return; }
+      setTimeout(poll, 12);
+    })();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
+})();
+</script>
+<link href="./fonts/inter.css" rel="stylesheet">
+<script src="./tailwind.min.js" onerror="window.__revealUI&&window.__revealUI()"></script>
+<style data-purpose="custom-styles">
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #dbe0e6;
+      color: #334155;
+    }
+    /* 防止 Tailwind 初始化前 SVG 露出浏览器默认的 300x150 尺寸 */
+    svg { width: 16px; height: 16px; display: block; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; background: #f8fafc; }
+    ::-webkit-scrollbar-button { display: none; width: 0; height: 0; background: transparent; }
+    ::-webkit-scrollbar-track { background: #f8fafc; border-radius: 8px; }
+    ::-webkit-scrollbar-track-piece { background: #f8fafc; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+    ::-webkit-scrollbar-corner { background: #f8fafc; }
+    /* 补偿页工具栏分段按钮：默认白底描边；「置反」开启时橙色点亮 */
+    .comp-seg{border-width:1px;border-style:solid;border-color:#e2e8f0;background:#fff;color:#64748b;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:600;transition:border-color .15s,background-color .15s,color .15s}
+    .comp-seg:not(:disabled):hover{border-color:#cbd5e1;color:#334155}
+    .comp-seg.on{border-color:#fed7aa;background:#fff7ed;color:#c2410c}
+    /* 「打开补偿文件」主按钮：黑底白字 */
+    #comp-open{border-width:1px;border-style:solid;border-color:#0f172a;background:#0f172a;color:#fff;border-radius:6px;box-shadow:none;transition:background-color .15s,border-color .15s}
+    #comp-open:hover{background:#1e293b;border-color:#1e293b}
+    /* 「补偿值置反」开关：默认黑底白字，触发后橙底白字 */
+    #comp-invert{border-width:1px;border-style:solid;border-color:#0f172a;background:#0f172a;color:#fff;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:600;white-space:nowrap;transition:background-color .15s,border-color .15s}
+    #comp-invert:not(:disabled):hover{background:#1e293b;border-color:#1e293b}
+    #comp-invert.on{border-color:#f97316;background:#f97316}
+    #comp-invert.on:hover{background:#ea580c;border-color:#ea580c}
+    #comp-invert:disabled{opacity:.45;cursor:not-allowed}
+    /* 「生成文件」：橙底白字 */
+    #comp-export{border-width:1px;border-style:solid;border-color:#f97316;background:#f97316;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;white-space:nowrap;box-shadow:none;transition:background-color .15s,border-color .15s}
+    #comp-export:not(:disabled):hover{background:#ea580c;border-color:#ea580c}
+    #comp-export:disabled{opacity:.45;cursor:not-allowed}
+    /* 曲线 SVG 尺寸压过兜底 svg{width:16px} */
+    #comp-chart svg{width:100%;height:100%;display:block}
+    /* 补偿表：行高 / 字号由 JS 计算，通过 CSS 变量传下来 */
+    #comp-scroll table{font-size:var(--comp-font,11px)}
+    #comp-scroll td{font-size:var(--comp-font,11px);line-height:var(--comp-line,14px);padding-left:var(--comp-pad,8px);padding-right:var(--comp-pad,8px)}
+    /* 表头：字号比正文小一号，整体不加粗 */
+    #comp-scroll th{font-size:var(--comp-head-font,11px);line-height:var(--comp-head-line,14px);font-weight:400;padding-left:var(--comp-pad,8px);padding-right:var(--comp-pad,8px)}
+    #comp-scroll tbody tr{height:var(--comp-row-h,18px)}
+    /* 补偿表行态：悬停加深；单击选中黑底白字 */
+    #comp-body tr{cursor:pointer;transition:background-color .12s ease}
+    #comp-body tr:hover{background:#e2e8f0}
+    #comp-body tr.is-selected{border-color:#0f172a;background:#0f172a}
+    #comp-body tr.is-selected:hover{background:#0f172a}
+    #comp-body tr.is-selected td{color:#fff}
+    /* 卡片四周渐晕（与母版同一套） */
+    .card-vignette.card-vignette{box-shadow:0 12px 24px rgba(100,116,139,.16),inset 10px 0 18px rgba(148,163,184,.05),inset -10px 0 18px rgba(148,163,184,.05),inset 0 -12px 18px rgba(148,163,184,.08)}
+    .comp-seg+ .comp-seg{margin-left:-6px}
+    svg { width: 16px; height: 16px; display: block; }
+</style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col select-none" style="background-color: #E8EAEC; margin: 0; padding: 0;">
+<!-- 顶部品牌条（纯展示，无其它功能入口） -->
+<header class="flex items-center gap-2 px-6 py-3 flex-shrink-0" style="background-color:#E8EAEC;">
+  <div class="w-7 h-7 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-lg rounded-tr-none rounded-bl-none shadow-sm">
+    <svg width="16" height="16" style="width:16px;height:16px;display:block" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"></path></svg>
+  </div>
+  <span class="font-bold text-base tracking-wider text-slate-800">Moen/SHANGSHUN</span>
+  <span class="ml-2 text-xs text-slate-400">补偿工具 · Compensation Tool</span>
+</header>
+<!-- ===== 补偿视图（独立版：默认即为当前视图，去掉了母版里的 viewchange 切换依赖）===== -->
+<section id="compensation-page" class="relative flex-1 z-40 overflow-hidden" style="background-color: #E8EAEC;">
+<div class="h-full flex flex-col">
+<div class="px-6 py-2 flex items-center gap-3 flex-shrink-0">
+<button type="button" id="comp-open" class="px-3 py-1.5 text-xs font-semibold shadow-sm">打开补偿文件</button>
+<input type="file" id="comp-input" accept=".rtl,.txt" class="hidden">
+
+<span id="comp-status" class="text-[10px] text-slate-400"></span>
+</div>
+<div class="px-6 pb-6 grid grid-cols-12 gap-5 flex-1 min-h-0">
+<!-- 左：补偿表 -->
+<div class="col-span-3 card-vignette bg-white rounded-2xl p-4 flex flex-col min-h-0">
+<div class="flex items-center justify-between mb-3 flex-shrink-0">
+<h3 class="text-xs font-bold text-slate-800">补偿表</h3>
+<button type="button" id="comp-invert" disabled title="补偿值置反：表格显示的值与生成的文件都取反">补偿值置反</button>
+</div>
+<div id="comp-viewport" class="flex-1 min-h-0 relative">
+<div id="comp-scroll" class="hidden absolute inset-x-0 top-0 overflow-auto rounded-xl border border-slate-100" style="height:0">
+<table id="comp-table" class="w-full text-left">
+<thead class="sticky top-0 bg-slate-50 text-slate-500"><tr>
+<th class="px-2 py-1.5 text-[11px] whitespace-nowrap">索引</th>
+<th class="px-2 py-1.5 text-[11px] text-center whitespace-nowrap"><span class="block">位置</span><span class="block">(mm)</span></th>
+<th class="px-2 py-1.5 text-[11px] text-right whitespace-nowrap"><span id="comp-main-label" class="block">校正</span><span class="block">(μm)</span></th>
+<th id="comp-inv-head" class="hidden px-2 py-1.5 text-[11px] text-right whitespace-nowrap"><span class="block">置反</span><span class="block">(μm)</span></th>
+</tr></thead>
+<tbody id="comp-body"></tbody>
+</table>
+</div>
+<div id="comp-empty" class="absolute inset-0"></div>
+</div>
+</div>
+<!-- 右栏上下两张卡：上=文件信息，下=补偿曲线 -->
+<div class="col-span-9 flex flex-col gap-5 min-h-0">
+<div class="relative bg-white rounded-2xl shadow-sm p-4 flex flex-col min-h-0 overflow-auto" style="height:calc((100% - 20px) * 0.4)">
+<h3 class="text-xs font-bold text-slate-800 mb-2.5 flex-shrink-0">文件信息</h3>
+<div id="comp-info" class="grid grid-cols-2 gap-x-8 gap-y-1.5 text-xs content-start"></div>
+<div id="comp-export-wrap" class="absolute right-4 bottom-4 flex justify-end">
+<button type="button" id="comp-export" class="hidden" disabled title="按当前「来源 + 补偿值置反」生成 .rtl 文件，原文件结构与排版保持原样">生成文件</button>
+</div>
+</div>
+<div class="bg-white rounded-2xl shadow-sm p-4 min-h-0 flex flex-col" style="height:calc((100% - 20px) * 0.6)">
+<div class="flex items-center justify-between mb-2 flex-shrink-0">
+<h3 class="text-xs font-bold text-slate-800">补偿曲线</h3>
+<div id="comp-chart-legend" class="hidden items-center gap-4 text-[10px] text-slate-500"></div>
+</div>
+<div id="comp-chart" class="flex-1 min-h-0"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<script src="./compensation-ui.js"></script></body></html>
